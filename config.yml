@@ -1,0 +1,44 @@
+# FlexGet Config for Synology DSM and Transmission
+# Basic script to download and unpack packed tv show episodes from RSS using Transmission and unrar.
+
+presets:
+  series:
+    series:
+      series:
+        - Game of Thrones
+        - Another Show
+
+tasks:
+  # the download task
+  download:
+    preset: series
+    rss:
+      url: http://example.com
+    transmission:
+      host: localhost
+      port: 9091
+      username: username
+      password: password
+      path: /volume1/Downloads/RSS
+
+  # the unpack task
+  unpack:
+    preset: series
+    find:
+      path: /volume1/Downloads/RSS
+      recursive: true
+      regexp: .*\.(rar)$
+    accept_all: true
+    only_new: yes
+    seen: local
+    require_field: series_name
+    series:
+      settings:
+        series:
+          parse_only: true
+    regexp:
+      reject:
+        - sample
+    set:
+      output_folder: /volume1/Series
+    exec: mkdir -p mkdir {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
