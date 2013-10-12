@@ -1,0 +1,16 @@
+{% if task.aborted -%}
+The downloading was aborted because: {{task.abort_reason}}
+
+{% endif -%}
+{% if task.accepted -%}
+FlexGet has just downloaded the following item(s):
+{%- for entry in task.accepted %}
+- {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
+{% endfor %}
+{% endif -%}
+{% if task.failed -%}
+The following item(s) have failed:
+{%- for entry in task.failed %}
+- {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
+{% endfor %}
+{% endif %}

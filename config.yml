@@ -20,6 +20,16 @@ tasks:
       username: username
       password: password
       path: /volume1/Downloads/RSS
+    email:
+      to: to@example.com
+      from: from@example.com
+      subject: 'DiskStation: Download Notification'
+      smtp_host: smtp.gmail.com
+      smtp_port: 465
+      smtp_ssl: true
+      smtp_username: email
+      smtp_password: password
+      template: downloaded
 
   # the unpack task
   unpack:
@@ -42,3 +52,13 @@ tasks:
     set:
       output_folder: /volume1/Series
     exec: mkdir -p mkdir {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
+    email:
+      to: to@example.com
+      from: from@example.com
+      subject: 'DiskStation: Unpack Notification'
+      smtp_host: smtp.gmail.com
+      smtp_port: 465
+      smtp_ssl: true
+      smtp_username: email
+      smtp_password: password
+      template: unpacked
