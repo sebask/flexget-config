@@ -12,3 +12,4 @@ This script contains the following tasks:
 
 1. The download task adds torrents from a RSS feed of the specified tv shows to Transmission using the web protocol.  
 2. The unpack task looks for a .rar/.nfo file, creates the destination folder (Series Name/Series Season) when needed and unpacks the episode.
+3. An email notification will be sent when a download or unpack is started.
