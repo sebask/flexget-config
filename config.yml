@@ -51,7 +51,7 @@ tasks:
         - sample
     set:
       output_folder: /volume1/Series
-    exec: mkdir -p mkdir {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
+    exec: mkdir -p {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
     email:
       to: to@example.com
       from: from@example.com
