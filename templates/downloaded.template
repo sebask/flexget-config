@@ -1,9 +1,9 @@
 {% if task.aborted -%}
-The downloading was aborted because: {{task.abort_reason}}
+The download was not started because: {{task.abort_reason}}
 
 {% endif -%}
 {% if task.accepted -%}
-FlexGet has just downloaded the following item(s):
+FlexGet has just started downloading the following item(s):
 {%- for entry in task.accepted %}
 - {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
 {% endfor %}
