@@ -1,7 +1,7 @@
 # FlexGet Config for Synology DSM and Transmission
 # Basic script to download and unpack packed tv show episodes from RSS using Transmission and unrar.
 
-presets:
+templates:
   series:
     series:
       series:
@@ -11,7 +11,7 @@ presets:
 tasks:
   # the download task
   download:
-    preset: series
+    template: series
     rss:
       url: http://example.com
     transmission:
@@ -33,7 +33,7 @@ tasks:
 
   # the unpack task
   unpack:
-    preset: series
+    template: series
     find:
       path: /volume1/Downloads/RSS
       recursive: true
