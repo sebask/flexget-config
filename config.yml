@@ -62,3 +62,8 @@ tasks:
       smtp_username: email
       smtp_password: password
       template: unpacked
+
+schedules:
+  - tasks: '*'
+    interval:
+      hours: 1
