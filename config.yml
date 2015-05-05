@@ -1,43 +1,105 @@
-# FlexGet Config for Synology DSM and Transmission
-# Basic script to download and unpack packed tv show episodes from RSS using Transmission and unrar.
+# FlexGet Configuration for Synology DSM and Transmission
+# Download and sort from a manual and wishlist feed, and download and unpack packed episodes from a feed using Transmission and unrar.
+
+secrets: secrets.yml
 
 templates:
-  series:
-    series:
-      series:
-        - Game of Thrones
-        - Another Show
 
-tasks:
-  # the download task
-  download:
-    template: series
-    rss:
-      url: http://example.com
+  transmission:
     transmission:
       host: localhost
       port: 9091
-      username: username
-      password: password
-      path: /volume1/Downloads/RSS
+      username: '{{ secrets.transmission.username }}'
+      password: '{{ secrets.transmission.password }}'
+
+  email:
     email:
-      to: to@example.com
-      from: from@example.com
-      subject: 'DiskStation: Download Notification'
-      smtp_host: smtp.gmail.com
+      to: '{{ secrets.email.to }}'
+      from: '{{ secrets.email.from }}'
+      subject: 'DiskStation Notification'
+      smtp_host: 'smtp.gmail.com'
       smtp_port: 465
       smtp_ssl: true
-      smtp_username: email
-      smtp_password: password
-      template: downloaded
+      smtp_username: '{{ secrets.email.smtp_username }}'
+      smtp_password: '{{ secrets.email.smtp_password }}'
 
-  # the unpack task
-  unpack:
-    template: series
+  series:
+    series:
+      series:
+        - Some Show
+        - Another Show
+
+tasks:
+
+  manual:
+    rss:
+      url: '{{ secrets.rss.manual }}'
+    transmission:
+      path: '/volume1/Downloads/Movies'
+    template:
+      - transmission
+      - email
+    accept_all: yes
+
+  wishlist:
+    rss:
+      url: '{{ secrets.rss.wishlist }}'
+    transmission:
+      path: '/volume1/Downloads/Movies'
+    template:
+      - transmission
+      - email
+    accept_all: yes
+    quality: 1080p bluray h264
+    regexp:
+      reject:
+        - \b3-?D\b: {from: title}
+        - \bHalf-SBS\b: {from: title}
+        - \bExtras\b: {from: title}
+        - \bHybrid\b: {from: title}
+
+  series:
+    rss:
+      url: '{{ secrets.rss.series }}'
+    transmission:
+      path: '/volume1/Downloads/Series'
+    template:
+      - series
+      - transmission
+      - email
+    configure_series:
+      settings:
+        timeframe: 6 hours
+        target: 1080p hdtv h264
+        quality: 720p hdtv h264
+        specials: no
+
+  sort-manual-wishlist:
     find:
-      path: /volume1/Downloads/RSS
+      path: '/volume1/Downloads/Movies'
+      recursive: true
+      regexp: .*\.(mkv)$
+    metainfo_series: yes
+    imdb_lookup: yes
+    accept_all: yes
+    seen: local
+    template: email
+    regexp:
+      reject:
+        - sample
+    set:
+      output_path: /volume1/Movies
+      output_folder: "{{ location|pathname }}"
+    exec: 'mkdir -p "{{ output_path }}/{{ output_folder }}" && cp "{{ location|pathdir }}/{{ location|pathname }}.mkv" "{{ output_path }}/{{ output_folder }}" && cp "{{ location|pathdir }}/{{ location|pathname }}.nfo" "{{ output_path }}/{{ output_folder }}"'
+
+  sort-series:
+    find:
+      path: '/volume1/Downloads/Series'
       recursive: true
       regexp: .*\.(rar)$
+    template:
+      - series
+      - email
     accept_all: true
     only_new: yes
     seen: local
@@ -45,25 +107,21 @@ tasks:
     series:
       settings:
         series:
-          parse_only: true
+          parse_only: yes
     regexp:
       reject:
         - sample
     set:
-      output_folder: /volume1/Series
-    exec: mkdir -p {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_folder }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
-    email:
-      to: to@example.com
-      from: from@example.com
-      subject: 'DiskStation: Unpack Notification'
-      smtp_host: smtp.gmail.com
-      smtp_port: 465
-      smtp_ssl: true
-      smtp_username: email
-      smtp_password: password
-      template: unpacked
+      output_path: /volume1/Series
+    exec: mkdir -p {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
 
 schedules:
-  - tasks: '*'
+  - tasks: [manual, wishlist]
     interval:
-      hours: 1
+      minutes: 5
+  - tasks: series
+    interval:
+      minutes: 30
+  - tasks: [sort-manual-wishlist, sort-series]
+    interval:
+      minutes: 15
