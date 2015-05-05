@@ -90,7 +90,7 @@ tasks:
     set:
       output_path: /volume1/Movies
       output_folder: "{{ location|pathname }}"
-    exec: 'mkdir -p "{{ output_path }}/{{ output_folder }}" && cp "{{ location|pathdir }}/{{ location|pathname }}.mkv" "{{ output_path }}/{{ output_folder }}" && cp "{{ location|pathdir }}/{{ location|pathname }}.nfo" "{{ output_path }}/{{ output_folder }}"'
+    exec: 'mkdir -p "{{ output_path }}/{{ output_folder }}" && cp "{{ location|pathdir }}/{{ location|pathname }}.mkv" "{{ output_path }}/{{ output_folder }}"'
 
   sort-series:
     find:
@@ -113,7 +113,7 @@ tasks:
         - sample
     set:
       output_path: /volume1/Series
-    exec: mkdir -p {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && unrar e -r -o- {{ location }} {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }} && cp {{ location | pathdir }}/*.nfo {{ output_path }}/{{ series_name|replace(' ','\ ') }}/Season\ {{ series_season }}
+    exec: mkdir -p "{{ output_path }}/{{ series_name|replace('\'','') }}/Season {{ series_season }}" && unrar e -r -o- "{{ location }}" "{{ output_path }}/{{ series_name|replace('\'','') }}/Season {{ series_season }}"
 
 schedules:
   - tasks: [manual, wishlist]
