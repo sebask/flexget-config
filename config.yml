@@ -118,7 +118,7 @@ tasks:
 schedules:
   - tasks: [manual, wishlist]
     interval:
-      minutes: 5
+      minutes: 15
   - tasks: series
     interval:
       minutes: 30
